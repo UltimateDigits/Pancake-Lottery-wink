@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TicketButton from "../assets/ticketbutton1.png";
 import { motion } from "framer-motion";
 import Modal from "../modals/Modal1.tsx"; 
@@ -8,6 +8,7 @@ const BuyBtn = ({price, discount, lotteryId}) => {
   const [isModalOpen, setIsModalOpen] = useState(false); 
   const [showModal2, setShowModal2] = useState(false); 
   const [ticketCount, setTicketCount] = useState(0); // Ticket count state lifted here
+  const [randval, setRandval] = useState([])
   const cakePerTicket = 3.03;
 console.log("price",price);
   // Calculate the total cost based on ticket count
@@ -24,6 +25,25 @@ console.log("price",price);
     setShowModal2(false); // Close Modal2
     setIsModalOpen(true); // Open Modal1
   };
+
+  
+  function generateRandomNumbers(ticketCount) {
+    const result = [];
+    
+    for (let i = 0; i < ticketCount; i++) {
+        // Generate a random 7-digit number
+        const ticketNumber = Math.floor(Math.random() * 1000000) + 1000000; 
+  
+        result.push(ticketNumber);
+    }
+    
+    return ticketCount === 1 ? result[0] : result;
+  }
+
+  useEffect(()=>{
+ const res =    generateRandomNumbers(ticketCount)
+ setRandval(res)
+  },[ticketCount])
 
   return (
     <div>
@@ -63,6 +83,12 @@ console.log("price",price);
             toggleModal={() => setShowModal2(false)} 
             switchToModal1={switchToModal1} 
             totalCost={totalCost}
+            ticketCount={ticketCount}
+            randnum={randval}
+            setrandval ={setRandval}
+            lotteryId={lotteryId}
+
+
           />
         </div>
       )}

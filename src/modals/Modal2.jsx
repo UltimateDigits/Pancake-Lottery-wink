@@ -1,17 +1,51 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1 }) => {
+import { buyLottery } from "../integration";
+
+const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1     ,    ticketCount , randnum,setrandval,lotteryId
+}) => {
   // State to hold the 6 random numbers
   const [randomNumbers, setRandomNumbers] = useState([1, 2, 3, 4, 5, 6]);
 
   // Function to generate 6 random numbers between 0 and 9
   const handleRandomize = () => {
-    const newNumbers = Array.from({ length: 6 }, () =>
-      Math.floor(Math.random() * 10)
-    );
+  const res =   generateRandomNumbers(ticketCount);
+
+  setrandval(res)
     setRandomNumbers(newNumbers); // Update the state with new random numbers
   };
+
+  console.log("randnum",randnum);
+  console.log(ticketCount,"ticketCount");
+
+
+  function generateRandomNumbers(ticketCount) {
+    const result = [];
+    
+    for (let i = 0; i < ticketCount; i++) {
+        // Generate a random 7-digit number
+        const ticketNumber = Math.floor(Math.random() * 1000000) + 1000000; 
+  
+        result.push(ticketNumber);
+    }
+    
+    return ticketCount === 1 ? result[0] : result;
+  }
+
+
+  const handleBuy = async()=>{
+    try {
+
+      console.log("ticsj",ticketCount);
+      console.log("lotteryID",lotteryId);
+      const res = await buyLottery(lotteryId,randnum)
+
+      console.log("res",res);
+    } catch (error) {
+      console.log("errir in buy",error);
+    }
+  }
 
   return (
     isOpen && (
@@ -57,17 +91,28 @@ const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1 }) => {
             </motion.button>
 
             <div className=" font-semibold">
-              <p>#001</p>
-              <p className="bg-[#3B384D] rounded-lg flex justify-between p-2 px-4">
+       
+            
                 {/* Display the random numbers */}
-                {randomNumbers.map((number, index) => (
-                  <span key={index}>{number}</span>
-                ))}
-              </p>
+                {randnum.map((number, index) => (
+                  <>                         <p>#00{index+1}</p>
+                    <p className="bg-[#3B384D] rounded-lg flex justify-between p-2 px-4">
+                      
+  <span key={index}>
+    {/* Convert the number to a string, split into individual digits, and map over each digit */}
+    {number.toString().split('').map((digit, digitIndex) => (
+      <span className="px-3" key={digitIndex}>{digit}</span>
+    ))}
+  </span>
+  </p>
+  </>
+
+))}
+          
             </div>
             <motion.button
               className="bg-[#1FC7D4] hover:bg-[#1FC7D4]/50 transition-colors duration-200 p-2 w-full rounded-xl text-black font-bold"
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.9 }} onClick={handleBuy}
             >
               Confirm and Buy
             </motion.button>
