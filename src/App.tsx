@@ -34,36 +34,23 @@ const App = () => {
   const [cakePrice, setCakePrice] = useState(0);
   const [discountDivisorval, setDiscountDivisorval] = useState(BigNumber(0));
 
-<<<<<<< HEAD
-  const [priceVal, setPriceVal] = useState("")
-const [cakePrice, setcakePrice] = useState(0)
-const [discountDivisorval, setdiscountDivisorval] = useState(BigNumber(0))
+
 
 const [lotteryID, setLotteryID] = useState("")
   console.log("cake",cakePriceBusd);
 
-  const getVal = async() => {
-    try {
-      const res = await getCurrentLottery();
-      console.log("res",res);
-      console.log("res in Number",Number(res));
-      console.log("res in sttrinf",res.toString());
-const id = res.toString();
-setLotteryID(id)
-      try {
-        const amount = await getLotteryDetails(id)
-=======
+
   const getVal = async () => {
     try {
       const res = await getCurrentLottery();
       const id = res.toString();
+      setLotteryID(id)
       const amount = await getLotteryDetails(id);
       const amountCollectedInCake = amount["amountCollectedInCake"];
       const priceTicketInCake = amount["priceTicketInCake"];
       const discountDivisor = amount["discountDivisor"];
       
       setDiscountDivisorval(discountDivisor);
->>>>>>> c25b32ec8bb4ba8ea3303aa67d19083c7b2f7f84
 
       const convertedValueofPrice = parseFloat((Number(priceTicketInCake) / 1e18).toFixed(2));
       setCakePrice(convertedValueofPrice);
