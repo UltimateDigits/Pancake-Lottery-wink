@@ -17,11 +17,8 @@ dependencies:
   axios:
     specifier: ^1.7.7
     version: 1.7.7
-  bigNumbe:
-    specifier: link:@pancakeswap/utils/bigNumbe
-    version: link:@pancakeswap/utils/bigNumbe
   bigNumber:
-    specifier: link:@pancakeswap/utils/bigNumber
+    specifier: '@pancakeswap/utils/bigNumber'
     version: link:@pancakeswap/utils/bigNumber
   bignumber.js:
     specifier: ^9.1.2
