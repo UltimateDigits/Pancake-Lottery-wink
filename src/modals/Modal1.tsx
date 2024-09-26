@@ -54,11 +54,37 @@ function generateRandomNumbers(ticketCount) {
 }
 
 useEffect(()=>{
-  getTicketCostAfterDiscount(ticketCount)
+
+  console.log("ticjket",ticketCount);
+  
+  getTicketCostAfterDiscount(ticketCount )
  const res =  generateRandomNumbers(ticketCount)
 setRandval(res)
 
 },[ticketCount])
+
+const getTicketCostAfterDiscountprice = useCallback(
+  (ticketCount: BigNumber, pricePerTicket: BigNumber, discountDivisor: BigNumber) => {
+
+    console.log("No of tickets:", ticketCount.toString());
+    console.log("Discount Divisor:", discountDivisor.toString());
+
+    // Calculate total cost before discount
+    const totalCost = BigNumber(ticketCount).multipliedBy(pricePerTicket);
+    console.log("totalcoass", totalCost);
+    
+    // Calculate discount
+    const discountAmount = totalCost.dividedBy(discountDivisor);
+    console.log("discout",discountAmount);
+    
+    // Total cost after discount
+    const totalAfterDiscount = totalCost.minus(discountAmount);
+
+    console.log("Total Cost After Discount:", totalAfterDiscount.toString());
+    return totalAfterDiscount;
+  },
+  [] // Dependencies array, add relevant dependencies if necessary
+);
 
 
   return (
