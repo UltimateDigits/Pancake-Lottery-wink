@@ -4,9 +4,17 @@ import { motion } from "framer-motion";
 import Buttons from "./Buttons";
 import BigNumber from 'bignumber.js'
 import { useEffect } from "react";
+import memoize from 'lodash/memoize'
+import _trimEnd from 'lodash/trimEnd'
 
-const Modal = ({ isOpen, toggleModal, switchToModal2, ticketCount, setTicketCount, totalCost, priceTicketInCake, discountDivisor, lotteryId  }) => {
+ const BIG_TEN = new BigNumber(10)
+ const BIG_ZERO = new BigNumber(0)
+
+const Modal = ({ isOpen, toggleModal, switchToModal2, ticketCount, setTicketCount, totalCost, priceTicketInCake, discountDivisor, lotteryId ,priceRaw }) => {
   const [showTooltip, setShowTooltip] = useState(false); // State to show/hide tooltip
+  const [discountValue, setDiscountValue] = useState('')
+  const [totalCostv, setTotalCost] = useState('')
+
 const [randval, setRandval] = useState([])
   const cakePerTicket = 3.03;
 
@@ -17,20 +25,54 @@ const [randval, setRandval] = useState([])
     }
   };
 
+  const getFullDecimalMultiplier = memoize((decimals: number): BigNumber => {
+    return BIG_TEN.pow(decimals)
+  })
+  
+   const getBalanceAmount = (amount: BigNumber, decimals: number | undefined = 18) => {
+    return amount.dividedBy(getFullDecimalMultiplier(decimals))
+  }
+  
+  /**
+   * This function is not really necessary but is used throughout the site.
+   */
+   const getBalanceNumber = (balance: BigNumber | undefined, decimals = 18) => {
+    return getBalanceAmount(balance || BIG_ZERO, decimals).toNumber()
+  }
+  
+   const getFullDisplayBalance = (balance: BigNumber, decimals = 18, displayDecimals?: number): string => {
+    const stringNumber = getBalanceAmount(balance, decimals).toFixed(displayDecimals as number)
+  
+    return displayDecimals ? _trimEnd(_trimEnd(stringNumber, '0'), '.') : stringNumber
+  }
   const getTicketCostAfterDiscount = useCallback(
     (ticketCount: BigNumber) => {
 
-      console.log("priceTicketInCake",priceTicketInCake);
+      console.log("tic count", ticketCount);
+      
+      const numberOfTicketsToBuy = new BigNumber(ticketCount)
+
+      console.log("numberOfTicketsToBuy",numberOfTicketsToBuy);
       
 
-      const priceInBN = new BigNumber(priceTicketInCake)
+      console.log("priceTicketInCake",priceRaw);
+
+      console.log("discountDivisor",BigNumber(discountDivisor.toString()));
+      const disc = BigNumber(discountDivisor.toString())
+
+      const priceInBN = new BigNumber(priceRaw)
+
+      console.log("priceBn", priceInBN);
+      
       const totalAfterDiscount = priceInBN
-        .times(ticketCount)
-        .times(new BigNumber(discountDivisor).plus(1).minus(ticketCount))
-        .div(discountDivisor)
+        .times(numberOfTicketsToBuy)
+        .times(new BigNumber(disc).plus(1).minus(numberOfTicketsToBuy))
+        .div(disc)
 
         console.log("tad",totalAfterDiscount);
-        console.log("tad",Number(totalAfterDiscount));
+
+        console.log("tad in num =", Number(totalAfterDiscount));
+        
         
       return totalAfterDiscount
     },
@@ -57,7 +99,14 @@ useEffect(()=>{
 
   console.log("ticjket",ticketCount);
   
-  getTicketCostAfterDiscount(ticketCount )
+  const costAfterDiscount = getTicketCostAfterDiscount(ticketCount )
+const numberOfTicketsToBuy = new BigNumber(ticketCount)
+const priceinBN = new BigNumber(priceRaw)
+  const costBeforeDiscount = priceinBN.times(numberOfTicketsToBuy)
+  const discountBeingApplied = costBeforeDiscount.minus(costAfterDiscount)
+  setDiscountValue(discountBeingApplied.gt(0) ? getFullDisplayBalance(discountBeingApplied, 18, 5) : '0')
+  setTotalCost(costAfterDiscount.gt(0) ? getFullDisplayBalance(costAfterDiscount, 18, 2) : '0')
+
  const res =  generateRandomNumbers(ticketCount)
 setRandval(res)
 
@@ -85,6 +134,7 @@ const getTicketCostAfterDiscountprice = useCallback(
   },
   [] // Dependencies array, add relevant dependencies if necessary
 );
+
 
 
   return (
@@ -183,13 +233,13 @@ const getTicketCostAfterDiscountprice = useCallback(
                     )}
                   </span>
                 </p>
-                <p>~{totalCost} CAKE</p>
+                <p>~{discountValue} CAKE</p>
               </div>
             </div>
             <div className="border border-[#B3A9CD]/10"></div>
             <div className="flex justify-between items-center text-[#B3A9CD] font-semibold">
               <p className=" ">You pay</p>
-              <p className="text-white">~{totalCost} CAKE</p>
+              <p className="text-white">~{totalCostv} CAKE</p>
             </div>
             <Buttons switchToModal2={switchToModal2} ticketsToBuy={randval} lotteryID={lotteryId}/>
           </div>

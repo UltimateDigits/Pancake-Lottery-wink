@@ -33,7 +33,7 @@ const App = () => {
   const [priceVal, setPriceVal] = useState("");
   const [cakePrice, setCakePrice] = useState(0);
   const [discountDivisorval, setDiscountDivisorval] = useState(BigNumber(0));
-
+const [priceRaw, setPriceRaw] = useState("")
 
 
 const [lotteryID, setLotteryID] = useState("")
@@ -49,7 +49,7 @@ const [lotteryID, setLotteryID] = useState("")
       const amountCollectedInCake = amount["amountCollectedInCake"];
       const priceTicketInCake = amount["priceTicketInCake"];
       const discountDivisor = amount["discountDivisor"];
-      
+      setPriceRaw(priceTicketInCake.toString())
       setDiscountDivisorval(discountDivisor);
 
       const convertedValueofPrice = parseFloat((Number(priceTicketInCake) / 1e18).toFixed(2));
@@ -86,7 +86,7 @@ const [lotteryID, setLotteryID] = useState("")
             <p className="font-bold">in Prizes!</p>
           </div>
           <div className="my-6">
-            <BuyBtn price={cakePrice} discount={discountDivisorval} lotteryId={lotteryID} />
+            <BuyBtn price={cakePrice} discount={discountDivisorval} lotteryId={lotteryID} priceRaw= {priceRaw} />
           </div>
 
           {/* Animated Stars and Tickets */}
