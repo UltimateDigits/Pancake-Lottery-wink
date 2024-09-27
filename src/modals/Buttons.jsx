@@ -1,12 +1,33 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { buyLottery } from "../integration";
+import { buyLottery, checkAllowance, Allowance} from "../integration";
 
 const Buttons = ({ switchToModal2, ticketsToBuy, lotteryID, tokenbal, totalcost, setErrorText ,setError}) => { // Receive the function as a prop
   const [isEnabled, setIsEnabled] = useState(false);
 
-  const handleEnableClick = () => {
-    setIsEnabled(true);
+  const handleEnableClick = async() => {
+
+    const res = await checkAllowance();
+
+    console.log("allowance  ",res);
+    console.log("allowance in num  ",Number(res));
+    console.log("allowance  in string",res.toString());
+
+    if(res === 0){
+try {
+  const res = await Allowance();
+  setIsEnabled(true);
+
+
+} catch (error) {
+  console.log("error in apprioval",error)
+}
+    }
+    else{
+      setIsEnabled(true);
+
+    }
+
   };
 
 

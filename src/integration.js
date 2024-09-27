@@ -95,6 +95,48 @@ export async function getTokenBalance() {
       return balance;
   
 }
+export async function checkAllowance() {
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []); // Request access to MetaMask accounts
+
+  const signer = provider.getSigner(); // Get the signer from the provider
+  const address = await signer.getAddress(); // Get the address from the signer
+
+
+    const contract = new ethers.Contract(
+        "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82", // Chain ID for BSC Mainnet
+        
+        tokenAbi,
+        signer
+      );
+
+      const balance = contract.allowance(address,"0x5aF6D33DE2ccEC94efb1bDF8f92Bd58085432d2c")
+
+      return balance;
+  
+}
+export async function Allowance() {
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []); // Request access to MetaMask accounts
+
+  const signer = provider.getSigner(); // Get the signer from the provider
+  const address = await signer.getAddress(); // Get the address from the signer
+
+
+    const contract = new ethers.Contract(
+        "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82", // Chain ID for BSC Mainnet
+        
+        tokenAbi,
+        signer
+      );
+
+      const balance = contract.approve("0x5aF6D33DE2ccEC94efb1bDF8f92Bd58085432d2c","115792089237316195423570985008687907853269984665640564039457584007913129639935")
+      await balance.wait()
+      return balance;
+  
+}
 export async function getCurrentLottery(lotteryID) {
 
     const RPC_URL = 'https://bsc-dataseed.binance.org/'; // Example for BSC Mainnet
