@@ -10,6 +10,7 @@ const BuyBtn = ({price, discount, lotteryId,priceRaw}) => {
   const [showModal2, setShowModal2] = useState(false); 
   const [ticketCount, setTicketCount] = useState(0); // Ticket count state lifted here
   const [randval, setRandval] = useState([])
+  const [tokenBal, setTokenBalval] = useState('')
   const cakePerTicket = 3.03;
 console.log("price",price);
   // Calculate the total cost based on ticket count
@@ -78,6 +79,7 @@ console.log("price",price);
             discountDivisor={discount}
             lotteryId={lotteryId}
             priceRaw={priceRaw}
+            setTokenBalval={setTokenBalval}
           />
         </div>
       )}

@@ -11,13 +11,16 @@ import { getTokenBalance } from "../integration";
  const BIG_TEN = new BigNumber(10)
  const BIG_ZERO = new BigNumber(0)
 
-const Modal = ({ isOpen, toggleModal, switchToModal2, ticketCount, setTicketCount, totalCost, priceTicketInCake, discountDivisor, lotteryId ,priceRaw }) => {
+const Modal = ({ isOpen, toggleModal, switchToModal2, ticketCount, setTicketCount, totalCost, priceTicketInCake, discountDivisor, lotteryId ,priceRaw,setTokenBalval }) => {
   const [showTooltip, setShowTooltip] = useState(false); // State to show/hide tooltip
   const [discountValue, setDiscountValue] = useState('')
   const [totalCostv, setTotalCost] = useState('')
 
 const [randval, setRandval] = useState([])
 const [tokenBal, setTokenBal] = useState('')
+const [tokenError, setTokenError] = useState(false)
+
+const [errorText, setErrorText] = useState("")
   const cakePerTicket = 3.03;
 
   const handleTicketChange = (e) => {
@@ -152,6 +155,7 @@ const res = getFullDisplayBalance(inBig, 18, 3)
 console.log("res of bal",res);
 
 setTokenBal(res)
+setTokenBalval(res)
 
   } catch (error) {
     console.log("issue in getting balance",error);
@@ -265,7 +269,8 @@ setTokenBal(res)
               <p className=" ">You pay</p>
               <p className="text-white">~{totalCostv} CAKE</p>
             </div>
-            <Buttons switchToModal2={switchToModal2} ticketsToBuy={randval} lotteryID={lotteryId}/>
+           {tokenError &&  <div className="text-red-500">{errorText}</div>}
+            <Buttons switchToModal2={switchToModal2} ticketsToBuy={randval} lotteryID={lotteryId} tokenbal={tokenBal} totalcost={totalCost} setErrorText={setErrorText} setError={setTokenError} />
           </div>
         </div>
       </div>

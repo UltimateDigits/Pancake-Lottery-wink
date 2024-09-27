@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { buyLottery } from "../integration";
 
-const Buttons = ({ switchToModal2, ticketsToBuy, lotteryID }) => { // Receive the function as a prop
+const Buttons = ({ switchToModal2, ticketsToBuy, lotteryID, tokenbal, totalcost, setErrorText ,setError}) => { // Receive the function as a prop
   const [isEnabled, setIsEnabled] = useState(false);
 
   const handleEnableClick = () => {
@@ -11,8 +11,15 @@ const Buttons = ({ switchToModal2, ticketsToBuy, lotteryID }) => { // Receive th
 
 
   const handleBuy = async() => {
-    try {
 
+    
+    try {
+if(tokenbal < totalcost){
+  setError(true)
+  setErrorText("Insufficient Cake Token Balance")
+  return
+}
+setError(false)
       console.log("ticsj",ticketsToBuy);
       console.log("lotteryID",lotteryID);
       const res = await buyLottery(lotteryID,ticketsToBuy)
