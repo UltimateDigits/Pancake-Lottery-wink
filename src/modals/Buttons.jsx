@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { buyLottery, checkAllowance, Allowance} from "../integration";
 
-const Buttons = ({ switchToModal2, ticketsToBuy, lotteryID, tokenbal, totalcost, setErrorText ,setError}) => { // Receive the function as a prop
+const Buttons = ({ switchToModal2, ticketsToBuy, lotteryID, tokenbal, totalcost, setErrorText ,setError,setIsModalOpen}) => { // Receive the function as a prop
   const [isEnabled, setIsEnabled] = useState(false);
 
   const handleEnableClick = async() => {
@@ -46,6 +46,10 @@ setError(false)
       const res = await buyLottery(lotteryID,ticketsToBuy)
 
       console.log("res",res);
+      alert("Purchase Successful")
+
+      setIsModalOpen(false)
+
     } catch (error) {
       console.log("errir in buy",error);
     }

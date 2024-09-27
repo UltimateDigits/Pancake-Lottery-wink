@@ -11,7 +11,7 @@ import { getTokenBalance } from "../integration";
  const BIG_TEN = new BigNumber(10)
  const BIG_ZERO = new BigNumber(0)
 
-const Modal = ({ isOpen, toggleModal, switchToModal2, ticketCount, setTicketCount, totalCost, priceTicketInCake, discountDivisor, lotteryId ,priceRaw,setTokenBalval }) => {
+const Modal = ({ isOpen, toggleModal, switchToModal2, ticketCount, setTicketCount, totalCost, priceTicketInCake, discountDivisor, lotteryId ,priceRaw,setTokenBalval, setIsModalOpen }) => {
   const [showTooltip, setShowTooltip] = useState(false); // State to show/hide tooltip
   const [discountValue, setDiscountValue] = useState('')
   const [totalCostv, setTotalCost] = useState('')
@@ -270,7 +270,7 @@ setTokenBalval(res)
               <p className="text-white">~{totalCostv} CAKE</p>
             </div>
            {tokenError &&  <div className="text-red-500">{errorText}</div>}
-            <Buttons switchToModal2={switchToModal2} ticketsToBuy={randval} lotteryID={lotteryId} tokenbal={tokenBal} totalcost={totalCost} setErrorText={setErrorText} setError={setTokenError} />
+            <Buttons switchToModal2={switchToModal2} ticketsToBuy={randval} lotteryID={lotteryId} tokenbal={tokenBal} totalcost={totalCost} setErrorText={setErrorText} setError={setTokenError} setIsModalOpen={setIsModalOpen} />
           </div>
         </div>
       </div>

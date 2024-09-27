@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 import { buyLottery } from "../integration";
 
-const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1     ,    ticketCount , randnum,setrandval,lotteryId
+const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1,ticketCount , randnum,setrandval,lotteryId,setIsModalOpen, tokenbal , totalcost,setErrorText,setError,errorText,error
 }) => {
   // State to hold the 6 random numbers
   const [randomNumbers, setRandomNumbers] = useState([1, 2, 3, 4, 5, 6]);
@@ -13,7 +13,6 @@ const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1     ,    ticket
   const res =   generateRandomNumbers(ticketCount);
 
   setrandval(res)
-    setRandomNumbers(newNumbers); // Update the state with new random numbers
   };
 
   console.log("randnum",randnum);
@@ -35,6 +34,13 @@ const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1     ,    ticket
 
 
   const handleBuy = async()=>{
+    // setIsModalOpen(false)
+
+    if(tokenbal < totalcost){
+      setError(true)
+      setErrorText("Insufficient Cake Token Balance")
+      return
+    }
     try {
 
       console.log("ticsj",ticketCount);
@@ -42,6 +48,10 @@ const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1     ,    ticket
       const res = await buyLottery(lotteryId,randnum)
 
       console.log("res",res);
+alert("Purchase Successful")
+      toggleModal()
+
+
     } catch (error) {
       console.log("errir in buy",error);
     }
@@ -110,6 +120,11 @@ const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1     ,    ticket
 ))}
           
             </div>
+       {
+        error &&      <div className="text-red-500">
+              {errorText}
+        </div>
+       }
             <motion.button
               className="bg-[#1FC7D4] hover:bg-[#1FC7D4]/50 transition-colors duration-200 p-2 w-full rounded-xl text-black font-bold"
               whileTap={{ scale: 0.9 }} onClick={handleBuy}
