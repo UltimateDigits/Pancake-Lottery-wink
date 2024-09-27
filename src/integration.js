@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import Abi from "./abi.json";
-
+import tokenAbi from "./tokenabi.json"
 
 const weiValue = "1000000000000000";
 const etherValue = ethers.utils.formatEther(weiValue);
@@ -72,6 +72,27 @@ export async function getLotteryDetails(lotteryID) {
       const lotteryDetail = contract.viewLottery(lotteryID)
 
       return lotteryDetail;
+  
+}
+export async function getTokenBalance() {
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []); // Request access to MetaMask accounts
+
+  const signer = provider.getSigner(); // Get the signer from the provider
+  const address = await signer.getAddress(); // Get the address from the signer
+
+
+    const contract = new ethers.Contract(
+        "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82", // Chain ID for BSC Mainnet
+        
+        tokenAbi,
+        signer
+      );
+
+      const balance = contract.balanceOf(address)
+
+      return balance;
   
 }
 export async function getCurrentLottery(lotteryID) {

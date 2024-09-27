@@ -3,6 +3,7 @@ import TicketButton from "../assets/ticketbutton1.png";
 import { motion } from "framer-motion";
 import Modal from "../modals/Modal1.tsx"; 
 import Modal2 from "../modals/Modal2.jsx"; 
+import { getTokenBalance } from "../integration.js";
 
 const BuyBtn = ({price, discount, lotteryId,priceRaw}) => {
   const [isModalOpen, setIsModalOpen] = useState(false); 
@@ -40,9 +41,14 @@ console.log("price",price);
     return ticketCount === 1 ? result[0] : result;
   }
 
-  useEffect(()=>{
+
+
+  useEffect( ()=>{
  const res =    generateRandomNumbers(ticketCount)
  setRandval(res)
+
+ 
+
   },[ticketCount])
 
   return (

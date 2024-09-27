@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 import { useEffect } from "react";
 import memoize from 'lodash/memoize'
 import _trimEnd from 'lodash/trimEnd'
+import { getTokenBalance } from "../integration";
 
  const BIG_TEN = new BigNumber(10)
  const BIG_ZERO = new BigNumber(0)
@@ -16,6 +17,7 @@ const Modal = ({ isOpen, toggleModal, switchToModal2, ticketCount, setTicketCoun
   const [totalCostv, setTotalCost] = useState('')
 
 const [randval, setRandval] = useState([])
+const [tokenBal, setTokenBal] = useState('')
   const cakePerTicket = 3.03;
 
   const handleTicketChange = (e) => {
@@ -98,7 +100,7 @@ function generateRandomNumbers(ticketCount) {
 useEffect(()=>{
 
   console.log("ticjket",ticketCount);
-  
+  getBal()
   const costAfterDiscount = getTicketCostAfterDiscount(ticketCount )
 const numberOfTicketsToBuy = new BigNumber(ticketCount)
 const priceinBN = new BigNumber(priceRaw)
@@ -134,6 +136,28 @@ const getTicketCostAfterDiscountprice = useCallback(
   },
   [] // Dependencies array, add relevant dependencies if necessary
 );
+
+
+const getBal = async()=>{
+  try {
+    const bal = await  getTokenBalance();
+console.log("bal",bal);
+
+const instring = bal.toString()
+const inBig = new BigNumber(instring)
+const res = getFullDisplayBalance(inBig, 18, 3)
+
+
+
+console.log("res of bal",res);
+
+setTokenBal(res)
+
+  } catch (error) {
+    console.log("issue in getting balance",error);
+    
+  }
+}
 
 
 
@@ -182,7 +206,7 @@ const getTicketCostAfterDiscountprice = useCallback(
                 </p>
               </div>
               <p className=" text-right text-xs pt-1 text-[#B3A9CD]">
-                CAKE balance: 5.2
+                CAKE balance:{tokenBal}
               </p>
             </div>
             <motion.button
