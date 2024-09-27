@@ -13,9 +13,9 @@ const Buttons = ({ switchToModal2, ticketsToBuy, lotteryID, tokenbal, totalcost,
     console.log("allowance in num  ",Number(res));
     console.log("allowance  in string",res.toString());
 
-    if(res === 0){
+    if(Number(res) === 0){
 try {
-  const res = await Allowance();
+  const ress = await Allowance();
   setIsEnabled(true);
 
 
