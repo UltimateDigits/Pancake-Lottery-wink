@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Modal from "../modals/Modal1.tsx"; 
 import Modal2 from "../modals/Modal2.jsx"; 
 import { getTokenBalance } from "../integration.js";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 const BuyBtn = ({price, discount, lotteryId,priceRaw}) => {
   const [isModalOpen, setIsModalOpen] = useState(false); 
@@ -21,7 +22,13 @@ console.log("price",price);
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
+  const analytics = getAnalytics();
+
   const switchToModal2 = () => {
+logEvent(analytics, 'select_content', {
+  content_type: 'wallet',
+  content_id: 'wallet_id'
+});
     setIsModalOpen(false); 
     setShowModal2(true); 
   };

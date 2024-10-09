@@ -7,6 +7,7 @@ import TicketRight from "./assets/ticket-r.png";
 import HeaderLogo from "./assets/pancakelogo.png";
 import Wallet from "./components/Wallet";
 import BuyBtn from "./components/BuyBtn";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 const App = () => {
   return (
