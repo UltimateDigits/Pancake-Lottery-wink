@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ThreeStars from "./assets/three-stars.png";
 import StarBig from "./assets/star-big.png";
 import StarSmall from "./assets/star-small.png";
@@ -7,9 +7,18 @@ import TicketRight from "./assets/ticket-r.png";
 import HeaderLogo from "./assets/pancakelogo.png";
 import Wallet from "./components/Wallet";
 import BuyBtn from "./components/BuyBtn";
-import { getAnalytics, logEvent } from "firebase/analytics";
+import { analytics } from '../firebase';
+import { logEvent } from "firebase/analytics";
 
 const App = () => {
+  //log event
+  useEffect(() => {
+    logEvent(analytics, 'app_open', {
+      appName: "Pancake Lottery Wink",
+      openTime: new Date().toISOString(),
+    })
+  }, [])
+
   return (
     <div className="bg-gradient-radial from-[#A881FC] to-[#5F39AA] bg-center bg-cover flex justify-center items-center min-h-screen inter-font">
       <div className="flex flex-col justify-center items-center mx-auto min-h-screen text-white max-w-[600px] relative">
