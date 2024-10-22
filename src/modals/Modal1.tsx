@@ -7,26 +7,34 @@ import { useEffect } from "react";
 import memoize from 'lodash/memoize'
 import _trimEnd from 'lodash/trimEnd'
 import { getTokenBalance } from "../integration";
+import { analytics } from '../../firebase';
+import { logEvent } from "firebase/analytics";
 
- const BIG_TEN = new BigNumber(10)
- const BIG_ZERO = new BigNumber(0)
+const BIG_TEN = new BigNumber(10)
+const BIG_ZERO = new BigNumber(0)
 
 const Modal = ({ isOpen, toggleModal, switchToModal2, ticketCount, setTicketCount, totalCost, priceTicketInCake, discountDivisor, lotteryId ,priceRaw,setTokenBalval, setIsModalOpen }) => {
-  const [showTooltip, setShowTooltip] = useState(false); // State to show/hide tooltip
-  const [discountValue, setDiscountValue] = useState('')
-  const [totalCostv, setTotalCost] = useState('')
+const [showTooltip, setShowTooltip] = useState(false); // State to show/hide tooltip
+const [discountValue, setDiscountValue] = useState('')
+const [totalCostv, setTotalCost] = useState('')
 
 const [randval, setRandval] = useState([])
 const [tokenBal, setTokenBal] = useState('')
 const [tokenError, setTokenError] = useState(false)
 
 const [errorText, setErrorText] = useState("")
-  const cakePerTicket = 3.03;
+const cakePerTicket = 3.03;
 
-  const handleTicketChange = (e) => {
-    const value = e.target.value;
+const handleTicketChange = (e) => {
+  const value = e.target.value;
     if (!isNaN(value) && value >= 0) {
       setTicketCount(value);
+
+      // Log the change in ticket count
+      logEvent(analytics, 'ticket_count_change', {
+        ticketCount: value,
+        changeTime: new Date().toISOString(),
+      });
     }
   };
 
@@ -34,22 +42,23 @@ const [errorText, setErrorText] = useState("")
     return BIG_TEN.pow(decimals)
   })
   
-   const getBalanceAmount = (amount: BigNumber, decimals: number | undefined = 18) => {
+  const getBalanceAmount = (amount: BigNumber, decimals: number | undefined = 18) => {
     return amount.dividedBy(getFullDecimalMultiplier(decimals))
   }
   
   /**
    * This function is not really necessary but is used throughout the site.
    */
-   const getBalanceNumber = (balance: BigNumber | undefined, decimals = 18) => {
+  const getBalanceNumber = (balance: BigNumber | undefined, decimals = 18) => {
     return getBalanceAmount(balance || BIG_ZERO, decimals).toNumber()
   }
   
-   const getFullDisplayBalance = (balance: BigNumber, decimals = 18, displayDecimals?: number): string => {
+  const getFullDisplayBalance = (balance: BigNumber, decimals = 18, displayDecimals?: number): string => {
     const stringNumber = getBalanceAmount(balance, decimals).toFixed(displayDecimals as number)
   
     return displayDecimals ? _trimEnd(_trimEnd(stringNumber, '0'), '.') : stringNumber
   }
+
   const getTicketCostAfterDiscount = useCallback(
     (ticketCount: BigNumber) => {
 
@@ -100,20 +109,26 @@ function generateRandomNumbers(ticketCount) {
   return ticketCount === 1 ? result[0] : result;
 }
 
-useEffect(()=>{
-
+useEffect(() => {
   console.log("ticjket",ticketCount);
   getBal()
   const costAfterDiscount = getTicketCostAfterDiscount(ticketCount )
-const numberOfTicketsToBuy = new BigNumber(ticketCount)
-const priceinBN = new BigNumber(priceRaw)
+  const numberOfTicketsToBuy = new BigNumber(ticketCount)
+  const priceinBN = new BigNumber(priceRaw)
   const costBeforeDiscount = priceinBN.times(numberOfTicketsToBuy)
   const discountBeingApplied = costBeforeDiscount.minus(costAfterDiscount)
   setDiscountValue(discountBeingApplied.gt(0) ? getFullDisplayBalance(discountBeingApplied, 18, 5) : '0')
   setTotalCost(costAfterDiscount.gt(0) ? getFullDisplayBalance(costAfterDiscount, 18, 2) : '0')
 
- const res =  generateRandomNumbers(ticketCount)
-setRandval(res)
+  const res =  generateRandomNumbers(ticketCount)
+  setRandval(res)
+
+  // Log the discount applied
+  logEvent(analytics, 'discount_applied', {
+    discountValue: discountBeingApplied.toString(),
+    ticketCount: ticketCount,
+    discountTime: new Date().toISOString(),
+  });
 
 },[ticketCount])
 
@@ -144,26 +159,31 @@ const getTicketCostAfterDiscountprice = useCallback(
 const getBal = async()=>{
   try {
     const bal = await  getTokenBalance();
-console.log("bal",bal);
+    console.log("bal",bal);
 
-const instring = bal.toString()
-const inBig = new BigNumber(instring)
-const res = getFullDisplayBalance(inBig, 18, 3)
+    const instring = bal.toString()
+    const inBig = new BigNumber(instring)
+    const res = getFullDisplayBalance(inBig, 18, 3)
 
+    console.log("res of bal",res);
 
+    setTokenBal(res)
+    setTokenBalval(res)
 
-console.log("res of bal",res);
-
-setTokenBal(res)
-setTokenBalval(res)
+    // Log insufficient balance if it's below total cost
+    if (new BigNumber(res).lt(totalCost)) {
+      logEvent(analytics, 'insufficient_balance', {
+        balance: res,
+        totalCost: totalCost,
+        checkTime: new Date().toISOString(),
+      });
+    }
 
   } catch (error) {
     console.log("issue in getting balance",error);
     
   }
 }
-
-
 
   return (
     isOpen && (
@@ -216,6 +236,13 @@ setTokenBalval(res)
             <motion.button
               whileTap={{ scale: 0.9 }}
               className="bg-[#3B384D] hover:bg-[#3B384D]/60 w-full text-[#1FC7D4] font-semibold rounded-full"
+              onClick={() => {
+                // Log the MAX button click
+                logEvent(analytics, 'max_button_click', {
+                  currentTicketCount: ticketCount,
+                  clickTime: new Date().toISOString(),
+                });
+              }}
             >
               MAX
             </motion.button>

@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import Modal from "../modals/Modal1.tsx"; 
 import Modal2 from "../modals/Modal2.jsx"; 
 import { getTokenBalance } from "../integration.js";
-import { getAnalytics, logEvent } from "firebase/analytics";
+import { analytics } from '../../firebase';
+import { logEvent } from "firebase/analytics";
 
 const BuyBtn = ({price, discount, lotteryId,priceRaw}) => {
   const [isModalOpen, setIsModalOpen] = useState(false); 
@@ -20,20 +21,33 @@ console.log("price",price);
   // Calculate the total cost based on ticket count
   const totalCost = (ticketCount * price).toFixed(2);
 
-  const toggleModal = () => setIsModalOpen(!isModalOpen);
+  // const toggleModal = () => setIsModalOpen(!isModalOpen);
+  const toggleModal = () => {
+    logEvent(analytics, 'buy_tickets_modal_open', {
+      ticketCount: ticketCount, // Number of tickets at the time of modal open
+      openTime: new Date().toISOString(),
+    });
+    setIsModalOpen(!isModalOpen);
+  };
 
-  const analytics = getAnalytics();
 
   const switchToModal2 = () => {
-logEvent(analytics, 'select_content', {
-  content_type: 'wallet',
-  content_id: 'wallet_id'
-});
+    logEvent(analytics, 'purchase_intent', {
+      totalCost: totalCost,   // Total cost of tickets
+      ticketCount: ticketCount,  // Number of tickets being bought
+      switchTime: new Date().toISOString(),
+    });
     setIsModalOpen(false); 
     setShowModal2(true); 
   };
 
   const switchToModal1 = () => {
+    logEvent(analytics, 'modal_back_to_ticket', {
+      ticketCount: ticketCount,
+      totalCost: totalCost,
+      switchTime: new Date().toISOString(),
+    });
+
     setShowModal2(false); // Close Modal2
     setIsModalOpen(true); // Open Modal1
   };
@@ -55,11 +69,8 @@ logEvent(analytics, 'select_content', {
 
 
   useEffect( ()=>{
- const res =    generateRandomNumbers(ticketCount)
- setRandval(res)
-
- 
-
+    const res =  generateRandomNumbers(ticketCount)
+    setRandval(res)
   },[ticketCount])
 
   return (

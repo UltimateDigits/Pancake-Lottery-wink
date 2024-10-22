@@ -9,6 +9,8 @@ import {
 import { WagmiProvider } from "wagmi";
 import { arbitrum, bsc } from "wagmi/chains"; // Import BNB Mainnet
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { analytics } from '../../firebase';
+import { logEvent } from "firebase/analytics";
 
 const config = getDefaultConfig({
   appName: "My RainbowKit App",
@@ -54,11 +56,16 @@ const CustomButton = () => {
                   })}
                 >
                   {(() => {
-                    if (!connected) {
+                    if (!connected) {                                      
                       return (
                         <motion.button
                           className="text-white w-[350px] md:w-[455px] h-[48px] bg-gradient-to-t from-[#492C81]/60 to-[#7343D2]/60 border border-[#7343D2] hover:from-[#492C81]/30 hover:to-[#7343D2]/30 font-bold rounded-[32px] flex justify-center items-center shadow-lg"
-                          onClick={openConnectModal}
+                          onClick={() => {
+                            logEvent(analytics, 'wallet_connect_attempt', {
+                              attemptTime: new Date().toISOString(),
+                            });
+                            openConnectModal();
+                          }}
                           type="button"
                           whileTap={{ scale: 0.9 }}
                         >
@@ -76,6 +83,12 @@ const CustomButton = () => {
                     }
 
                     if (chain.unsupported) {
+                      logEvent(analytics, 'unsupported_network', {
+                        chainId: chain.id,  // Log the chain ID of the unsupported network
+                        accountName: account.displayName,  // log the account name
+                        time: new Date().toISOString(),
+                      });
+
                       return (
                         <motion.button
                           className=" text-white w-[350px] md:w-[455px] h-[48px] bg-gradient-to-t from-[#492C81]/60 to-[#7343D2]/60 border border-[#7343D2] hover:from-[#492C81]/30 hover:to-[#7343D2]/30 font-bold rounded-[32px]"
@@ -87,6 +100,12 @@ const CustomButton = () => {
                         </motion.button>
                       );
                     }
+
+                    logEvent(analytics, 'wallet_connected', {
+                      accountName: account.displayName,  // Log the account display name
+                      balance: account.displayBalance,  // Log the balance, if available
+                      connectionTime: new Date().toISOString(),
+                    });
 
                     return (
                       <div className="w-[350px] md:w-[455px] h-[48px]">

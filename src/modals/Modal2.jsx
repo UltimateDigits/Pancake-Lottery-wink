@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 
 import { buyLottery } from "../integration";
+import { analytics } from '../../firebase';
+import { logEvent } from "firebase/analytics";
 
 const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1,ticketCount , randnum,setrandval,lotteryId,setIsModalOpen, tokenbal , totalcost,setErrorText,setError,errorText,error
 }) => {
@@ -35,24 +37,61 @@ const Modal2 = ({ isOpen, toggleModal, totalCost, switchToModal1,ticketCount , r
 
   const handleBuy = async()=>{
     // setIsModalOpen(false)
+    logEvent(analytics, 'purchase_attempt', {
+      ticketCount: ticketCount,
+      totalCost: totalCost,
+      tokenBalance: tokenbal, // Log the user's current token balance
+      attemptTime: new Date().toISOString(),
+    });
 
     if(tokenbal < totalcost){
       setError(true)
       setErrorText("Insufficient Cake Token Balance")
+
+      // Log failed purchase due to insufficient balance
+      logEvent(analytics, 'purchase_failed', {
+        reason: "insufficient_balance",
+        ticketCount: ticketCount,
+        totalCost: totalCost,
+        failureTime: new Date().toISOString(),
+      });
+
       return
     }
     try {
 
       console.log("ticsj",ticketCount);
       console.log("lotteryID",lotteryId);
+
+      //calling the rest of the purchase function
       const res = await buyLottery(lotteryId,randnum)
 
+      // Log successful purchase and revenue
+      logEvent(analytics, 'purchase_success', {
+        ticketCount: ticketCount,
+        totalCost: totalCost,
+        purchaseTime: new Date().toISOString(),
+        lotteryId: lotteryId,
+      });
+
+      // to track total revenue
+      logEvent(analytics, 'revenue_generated', {
+        revenue: totalCost,
+        purchaseTime: new Date().toISOString(),
+      });
+
       console.log("res",res);
-alert("Purchase Successful")
+      alert("Purchase Successful")
       toggleModal()
 
-
     } catch (error) {
+      logEvent(analytics, 'purchase_failed', {
+        reason: error.message, // Log the actual error message for better insights
+        ticketCount: ticketCount,
+        totalCost: totalCost,
+        failureTime: new Date().toISOString(),
+      });
+
       console.log("errir in buy",error);
     }
   }
